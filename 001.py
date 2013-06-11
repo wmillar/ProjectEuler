@@ -6,9 +6,6 @@ Find the sum of all the multiples of 3 or 5 below 1000.
 '''
 
 def sumOfMultiples(n, limit=1000):
-    s = 0
-    for i in xrange(n, limit, n):
-        s += i
-    return s
+    return sum(xrange(n, limit, n))
 
 print sumOfMultiples(3) + sumOfMultiples(5) - sumOfMultiples(15)
