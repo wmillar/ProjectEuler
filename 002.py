@@ -8,10 +8,20 @@ By considering the terms in the Fibonacci sequence whose values do not exceed
 four million, find the sum of the even-valued terms.
 '''
 
-totalSum, x, y, z = 0, 0, 1, 0
-while z < 4000000:
-    z = x + y
-    x, y = y, z
-    if z % 2 == 0:
-        totalSum += z
-print totalSum
+def fibGen():
+    a, b = 1, 1
+    while True:
+        yield a
+        b, a = a, a + b
+        
+
+def sumEvenFib(limit):
+    evenSum = 0
+    for n in fibGen():
+        if n > limit:
+            return evenSum
+        if n % 2 == 0:
+            evenSum += n
+
+
+print sumEvenFib(4000000)
