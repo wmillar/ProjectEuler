@@ -6,10 +6,17 @@ their digits.
 
 Note: as 1! = 1 and 2! = 2 are not sums they are not included.
 '''
-factorial = (1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880)
 
+factorial = [1] + map(lambda x: reduce(lambda x,y: x*y,
+                                       range(1, x+1)), range(1, 10))
 totalSum = 0
-for n in xrange(3, 50000):
-    if n == sum(map(lambda x: factorial[x], map(int, str(n)))):
-        totalSum += n
+n = 2
+while True:
+    for n in xrange(n + 1, n + 50000):
+        if n == sum(factorial[d] for d in map(int, str(n))):
+            totalSum += n
+            break
+    else:
+        break
+
 print totalSum
