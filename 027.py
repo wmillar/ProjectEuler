@@ -38,14 +38,7 @@ def eq(n, a, b):
 
 
 def checkPrime(n):
-    if n % 2 == 0:
-        return False
-    elif n < 0:
-        return False
-    elif n >= sieveLength:
-        return False
-    else:
-        return sieve[n]
+    return not (n < 0 or n >= sieveLength or n % 2 == 0 or not sieve[n])
 
 
 def countConsecutive(a, b):
