@@ -5,46 +5,46 @@ to 10 without any remainder.
 What is the smallest positive number that is evenly divisible by all of the
 numbers from 1 to 20?
 '''
+import collections
+import itertools
+from operator import mul
 
-def getPrimeFactors(limit):
-    fDict = {2: False}
+
+def getPF(limit):
+    sieve = [False] * limit
     for n in xrange(4, limit, 2):
-        origN = n
-        fDict[n] = []
+        original_n = n
+        sieve[n] = [2]
+        n /= 2
         while n % 2 == 0:
-            fDict[origN].append(2)
+            sieve[original_n].append(2)
             n /= 2
-    for n in xrange(3, limit, 2):
-        if n not in fDict:
-            fDict[n] = False
-            for n2 in xrange(n * 2, limit, n):
-                if n2 not in fDict:
-                    fDict[n2] = []
-                origN2 = n2
-                while n2 % n == 0:
-                    fDict[origN2].append(n)
-                    n2 /= n
-    return fDict
+    for n in xrange(3, limit / 2 + 1, 2):
+        if not sieve[n]:
+            for m in xrange(n * 2, limit, n):
+                original_m = m
+                if not sieve[m]:
+                    sieve[m] = [n]
+                    m /= n
+                else:
+                    sieve[m].append(n)
+                    m /= n
+                while m % n == 0:
+                    sieve[original_m].append(n)
+                    m /= n
+    return sieve
 
 
-def findMaxPowers(fDict):
-    maxDict = {}
-    for n, factors in fDict.items():
-        if not factors:
-            maxDict[n] = 1
-            continue
-        powers = [(d, factors.count(d)) for d in set(factors)]
-        for n, p in powers:
-            if p > maxDict[n]:
-                maxDict[n] = p
-    return maxDict
+def minDiv(limit):
+    factorization = getPF(limit + 1)[2:]
+    primes = itertools.imap(lambda i, f: f if f else [i],
+                            xrange(2, limit + 1), factorization)
+    powers = collections.defaultdict(int)
+    for factors in primes:
+        for n, p in collections.Counter(factors).iteritems():
+            if p > powers[n]:
+                powers[n] = p
+    return reduce(mul, itertools.starmap(pow, powers.iteritems()))
 
 
-def multMaxPowers(maxDict):
-    result = 1
-    for n, p in maxDict.items():
-        result *= pow(n, p)
-    return result
-
-
-print multMaxPowers(findMaxPowers(getPrimeFactors(20)))
+print minDiv(20)
