@@ -39,9 +39,12 @@ def truncRight(nStr):
         yield current
         current = current[:-1]
 
-
 def truncGenerator(nStr):
     return itertools.chain(truncLeft(nStr), truncRight(nStr))
+
+
+def allTruncPrime(nStr):
+    return all(sieve[int(truncated)] for truncated in truncGenerator(nStr))
 
 
 def filterEnds(nStr):
@@ -49,15 +52,11 @@ def filterEnds(nStr):
 
 
 def onlyOdds(nStr):
-    return all(iter(int(n) % 2 == 1 for n in nStr))
+    return all(int(n) % 2 == 1 for n in nStr)
 
 
 def check(nStr):
-    if not (filterEnds(nStr) and onlyOdds(nStr[1:])):
-        return False
-    if not all(sieve[int(truncated)] for truncated in truncGenerator(nStr)):
-        return False
-    return True
+    return (filterEnds(nStr) and onlyOdds(nStr[1:]) and allTruncPrime(nStr))
 
 
 primes, sieve = getPrimes(10**6)
