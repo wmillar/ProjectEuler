@@ -9,95 +9,59 @@ right and right to left.
 
 NOTE: 2, 3, 5, and 7 are not considered to be truncatable primes.
 '''
-def genPrimes(limit):
-    limit2 = limit + 1
-    primeDict = {}
-    for i in xrange(2, limit+1):
-        primeDict[i] = True
-    sieveNum = 1
-    while True:
-        currentNum = sieveNum + 1
-        i = currentNum
-        if currentNum == limit:
-            return primeDict
-        while True:
-            if i == limit:
-                return primeDict
-            if primeDict[i] == True:
-                sieveNum = i
-                break
-            else:
-                i += 1
-        i = 2
-        while True:
-            sieveProduct = sieveNum * i
-            if sieveProduct <= limit:
-                primeDict[sieveProduct] = False
-                i += 1
-            else:
-                break
-    return primeDict
+import itertools
 
-#outputs list of primes up to(including) limit
-def genPrimesList(limit):
-    primeList = []
-    i = 2
-    for j in genPrimes(limit).values():
-        if j == True:
-            primeList.append(i)
-        i += 1
-    return primeList
 
-def truncLR(num):
-    truncList = []
-    i = 0
-    limit = len(num)-1
-    while i < limit:
-        num = num[1:]
-        yield num
-        i += 1
+def getPrimes(limit):
+    primes, sieve = ['2'], [True] * limit
+    sq_limit = int(limit**.5) + 1
+    if sq_limit % 2 == 0:
+        sq_limit += 1
+    for n in xrange(3, sq_limit, 2):
+        if sieve[n]:
+            primes.append(str(n))
+            for m in xrange(n * n, limit, n * 2):
+                sieve[m] = False
+    return (primes + [str(n) for n in xrange(sq_limit, limit, 2) if sieve[n]],
+            sieve)
 
-def truncRL(num):
-    truncList = []
-    i = 0
-    limit = len(num)-1
-    while i < limit:
-        num = num[:-1]
-        yield num
-        i += 1
 
-def checkPrime(num):
-    if num=="23":
-        return True
-    for c in num:
-        if c=="0" or c=="2" or c=="4" or c=="6" or c=="8":
-            return False
+def truncLeft(nStr):
+    current = nStr[1:]
+    while current:
+        yield current
+        current = current[1:]
+
+
+def truncRight(nStr):
+    current = nStr[:-1]
+    while current:
+        yield current
+        current = current[:-1]
+
+
+def truncGenerator(nStr):
+    return itertools.chain(truncLeft(nStr), truncRight(nStr))
+
+
+def filterEnds(nStr):
+    return not (nStr[0] in '468019' or nStr[-1] in '24680159')
+
+
+def onlyOdds(nStr):
+    return all(iter(int(n) % 2 == 1 for n in nStr))
+
+
+def check(nStr):
+    if not (filterEnds(nStr) and onlyOdds(nStr[1:])):
+        return False
+    if not all(sieve[int(truncated)] for truncated in truncGenerator(nStr)):
+        return False
     return True
-    
 
-bigPrimeList = genPrimesList(999999)
-totalSum = 0
 
-for prime in bigPrimeList:
-    primeStr = str(prime)
-    if checkPrime(primeStr):
-        allPrimes = True
-        for num in truncLR(primeStr):
-            try:
-                bigPrimeList.index(int(num))
-            except:
-                allPrimes = False
-                break
-        if allPrimes:
-            for num in truncRL(primeStr):
-                try:
-                    bigPrimeList.index(int(num))
-                except:
-                    allPrimes = False
-                    break
-            if allPrimes:
-                totalSum += prime
-                print prime
+primes, sieve = getPrimes(10**6)
+primes = primes[4:]     # remove 2, 3, 5, 7
 
-#remove 3,5,7 from sum
-print totalSum-15
+
+print sum(int(prime) for prime in primes if check(prime))
