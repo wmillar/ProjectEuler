@@ -13,8 +13,6 @@ Using words.txt (right click and 'Save Link/Target As...'), a 16K text file
 containing nearly two-thousand common English words, how many are triangle
 words?
 '''
-from itertools import count
-
 
 def solve_eq(n):
     return -0.5 + pow(0.25 - (2  * n), 0.5)
@@ -25,10 +23,9 @@ def t(n):
 
 
 def isTriangleWord(word):
-    wordValue = sum(valueDict[c] for c in word)
+    wordValue = sum(ord(c) - 64 for c in word)
     return t(int(solve_eq(-wordValue))) == wordValue
 
 
-valueDict = dict(zip(map(chr, xrange(65, 91)), count(1)))
 wordList = open('words.txt', 'r').read().replace('"', '').split(',')
 print map(isTriangleWord, wordList).count(True)
