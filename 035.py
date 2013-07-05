@@ -1,82 +1,45 @@
-def genPrimes(limit):
-    limit2 = limit + 1
-    primeDict = {}
-    for i in xrange(2, limit+1):
-        primeDict[i] = True
-    sieveNum = 1
-    while True:
-        currentNum = sieveNum + 1
-        i = currentNum
-        if currentNum == limit:
-            return primeDict
-        while True:
-            if i == limit:
-                return primeDict
-            if primeDict[i] == True:
-                sieveNum = i
-                break
-            else:
-                i += 1
-        i = 2
-        while True:
-            sieveProduct = sieveNum * i
-            if sieveProduct <= limit:
-                primeDict[sieveProduct] = False
-                i += 1
-            else:
-                break
-    return primeDict
+'''
+The number, 197, is called a circular prime because all rotations of the
+digits: 197, 971, and 719, are themselves prime.
 
-#outputs list of primes up to(including) limit
-def genPrimesList(limit):
-    primeList = []
-    i = 2
-    for j in genPrimes(limit).values():
-        if j == True:
-            primeList.append(i)
-        i += 1
-    return primeList
+There are thirteen such primes below 100:
+2, 3, 5, 7, 11, 13, 17, 31, 37, 71, 73, 79, and 97.
 
-def rotateNum(num):
-    num = str(num)
-    rotations = []
-    i = 0
-    while i < len(num)-1:
-        tempChar = num[0]
-        num = num[1:] + tempChar
-        rotations.append(num)
-        i += 1
-    return rotations
+How many circular primes are there below one million?
+'''
 
-def goodRotateNum(rotationList):
-    rotations = []
-    for rotation in rotationList:
-        #rotations beginning with a '0' are ignored
-        if rotation[0] != "0":
-            rotations.append(int(rotation))
-    return rotations
+def getPrimes(limit):
+    sieve = [True] * limit
+    for n in xrange(3, int(limit**.5) + 1, 2):
+        if sieve[n]:
+            sieve[n*n::n*2] = [False] * ((limit-n*n-1)/(n*2) + 1)
+    return [2] + [n for n in xrange(3, limit, 2) if sieve[n]], sieve
 
-def checkPrime(prime):
-    prime = str(prime)
-    for c in prime:
-        if c=="2" or c=="4" or c=="6" or c=="8":
-            return False
-    return True
 
-bigPrimeList = genPrimesList(999999)
-circPrimesFound = 0
+def rotate(n):
+    current = n
+    for i in xrange(len(n)):
+        current = current[-1] + current[:-1]
+        yield int(current)
+        
 
-for prime in bigPrimeList:
-    if checkPrime(prime):
-        primeList = goodRotateNum(rotateNum(prime))
-        goodPrime = True
-        for num in primeList:
-            try:
-                bigPrimeList.index(num)
-            except:
-                goodPrime = False
-                break
-        if goodPrime:
-            circPrimesFound += 1
-#            print prime
-print circPrimesFound+1
+def onlyOddDigits(n):
+    return all(d % 2 == 1 for d in map(int, n))
+
+
+def isCircular(rotations, sieve):
+    return all(sieve[circ] for circ in rotations)
+
+
+def getCircularPrimes(limit):
+    primes, sieve = getPrimes(limit)
+    primes = map(str, primes)
+    circularPrimes = set(['2'])
+    for n in filter(onlyOddDigits, primes):
+        rotations = set(rotate(n))
+        if isCircular(rotations, sieve):
+            circularPrimes = circularPrimes.union(rotations)
+    return circularPrimes
+
+
+print len(getCircularPrimes(10**6))
