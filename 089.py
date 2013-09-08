@@ -27,70 +27,44 @@ minimal form.
 Note: You can assume that all the Roman numerals in the file contain no more
 than four consecutive identical units.
 '''
+from collections import deque
 
-f = open('roman.txt', 'r')
-roman = f.read().splitlines()
-f.close()
 
-valueDict = {'I':1,'V':5,'X':10,'L':50,'C':100,'D':500,'M':1000}
-valueOrder = 'IVXLCDM'
+numDict = dict(zip('IVXLCDM', (1, 5, 10, 50, 100, 500, 1000)))
+subtracts = {'IV', 'IX', 'XL', 'XC', 'CD', 'CM'}
+numDict.update(dict(zip(subtracts, (numDict[c[1]]-numDict[c[0]] for c in subtracts))))
+decDict = {value: key for key, value in numDict.items()}
+decDescending = sorted(decDict.keys(), reverse=True)
 
-def convRomToDec(numerals):
-    global valueDict, valueOrder
+
+def num2dec(string):
+    string = deque(string)
     value = 0
-    while numerals:
-        cNum,cNumConsec = numerals[0],1
-        for c in numerals[1:]:
-            if c == cNum:
-                cNumConsec += 1
-            else:
-                break
-        if cNumConsec > 1:
-            value += valueDict[cNum]*cNumConsec
-            numerals = numerals[cNumConsec:]
+    while string:
+        c = string.popleft()
+        if string and c + string[0] in subtracts:
+            value += numDict[string.popleft()] - numDict[c]
         else:
-            if len(numerals) > 1:
-                if valueOrder.index(numerals[1]) > valueOrder.index(cNum):
-                    value += valueDict[numerals[1]]-valueDict[cNum]
-                    numerals = numerals[2:]
-                else:
-                    value += valueDict[cNum]
-                    numerals = numerals[1:]
-            else:
-                value += valueDict[cNum]
-                numerals = numerals[1:]
+            value += numDict[c]
     return value
 
-def convDecToRom(num):
-    global valueDict, valueOrder
-    values,numStr,numerals = [],str(num),''
-    numeralDict = {4:'IV',9:'IX',40:'XL',90:'XC',400:'CD',900:'CM'}
-    while numStr:
-        values.append(int(numStr[0]+'0'*(len(numStr)-1)))
-        numStr = numStr[1:]
-    for n in values:
-        if n in numeralDict:
-            numerals += numeralDict[n]
-        else:
-            if n == 0:
-                pass
-            elif n < 4:     #1-3
-                numerals += 'I'*n
-            elif n < 10:    #5-9
-                numerals += 'V'+'I'*(n-5)
-            elif n < 40:    #20-30
-                numerals += 'X'*(n/10)
-            elif n < 90:    #50-80
-                numerals += 'L'+'X'*((n-50)/10)
-            elif n < 500:   #200-400
-                numerals += 'C'*(n/100)
-            elif n < 900:   #600-800
-                numerals += 'D'+'C'*((n-500)/100)
-            else:           #2000+
-                numerals += 'M'*(n/1000)
-    return numerals
 
-savedChar = 0
-for numerals in roman:
-    savedChar += len(numerals)-len(convDecToRom(convRomToDec(numerals)))
-print savedChar
+def get_numeral_value(value):
+    for v in decDescending:
+        if value >= v:
+            return v
+
+
+def dec2num(n):
+    result = ''
+    while n:
+        numeral_value = get_numeral_value(n)
+        result += decDict[numeral_value]
+        n -= numeral_value
+    return result
+
+
+with open('roman.txt', 'r') as f:
+    numerals = f.read().splitlines()
+
+print sum(len(num) - len(dec2num(num2dec(num))) for num in numerals)
