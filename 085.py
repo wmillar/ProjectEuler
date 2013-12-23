@@ -4,8 +4,6 @@ contains eighteen rectangles.
 
 Although there exists no rectangular grid that contains exactly two million
 rectangles, find the area of the grid with the nearest solution.
-
-solved while on OYOT so that is why its ugly code
 '''
 
 def countRectangles(x, y):

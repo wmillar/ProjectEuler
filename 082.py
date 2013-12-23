@@ -5,7 +5,6 @@ The minimal path sum in the 5 by 5 matrix below, by starting in any cell in
 the left column and finishing in any cell in the right column, and only moving
 up, down, and right, is indicated in red and bold; the sum is equal to 994.
 
-
     131  673  234  103   18
     201   96  342  965  150
     630  803  746  422  111

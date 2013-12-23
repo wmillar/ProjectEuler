@@ -1,20 +1,24 @@
 # -*- coding: utf-8 -*-
 '''
-Euler's Totient function, φ(n) [sometimes called the phi function], is used to determine the number of numbers less than n which are relatively prime to n. For example, as 1, 2, 4, 5, 7, and 8, are all less than nine and relatively prime to nine, φ(9)=6.
+Euler's Totient function, φ(n) [sometimes called the phi function], is used to
+determine the number of numbers less than n which are relatively prime to n.
+For example, as 1, 2, 4, 5, 7, and 8, are all less than nine and relatively
+prime to nine, φ(9)=6.
 
-n	Relatively Prime    φ(n)    n/φ(n)
-2	1	            1	    2
-3	1,2	            2	    1.5
-4	1,3	            2	    2
-5	1,2,3,4	            4	    1.25
-6	1,5	            2	    3
-7	1,2,3,4,5,6	    6	    1.1666...
-8	1,3,5,7	            4	    2
-9	1,2,4,5,7,8	    6	    1.5
-10	1,3,7,9	            4	    2.5
-It can be seen that n=6 produces a maximum n/φ(n) for n  10.
+    n   Relatively Prime  φ(n)  n/φ(n)
+    2   1                 1     2
+    3   1,2               2     1.5
+    4   1,3               2     2
+    5   1,2,3,4           4     1.25
+    6   1,5               2     3
+    7   1,2,3,4,5,6       6     1.1666...
+    8   1,3,5,7           4     2
+    9   1,2,4,5,7,8       6     1.5
+    10  1,3,7,9           4     2.5
 
-Find the value of n  1,000,000 for which n/φ(n) is a maximum.
+It can be seen that n=6 produces a maximum n/φ(n) for n ≤ 10.
+
+Find the value of n ≤ 1,000,000 for which n/φ(n) is a maximum.
 '''
 def genPrimes(limit):
     primeDict = {}
@@ -54,30 +58,6 @@ def genPrimesList(limit):
         i += 1
     return primeList
 
-'''     #unncessary functions
-#returns the prime factorization(if possible) of number
-def primeFactor(num):
-    global primeList
-    divisorList = []
-    for prime in primeList:
-        if prime > num:
-            return False
-        while num % prime == 0:
-            num /= prime
-            divisorList.append(prime)
-            if num == 1:
-                return divisorList
-
-def totient(num):
-    divisors = primeFactor(num)
-    if not divisors:
-        return False
-    divisors = set(divisors)
-    product = num
-    for prime in divisors:
-        product *= (1 - 1.0/prime)
-    return product
-'''
 
 primeList = genPrimesList(50)
 
